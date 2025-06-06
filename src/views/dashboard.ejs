@@ -1,0 +1,91 @@
+<%# backend-api/src/views/dashboard.ejs %>
+
+<% locals.title = "Dashboard"; %>
+<% locals.pageHeading = "Dashboard Utama"; %>
+<% locals.currentPath = "/admin/dashboard"; %>
+
+<!-- Content Row untuk Statistik -->
+<div class="row">
+
+    <!-- Card Kode Cash Pending -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Kode Cash Pending</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="statPendingCashCodesCount">-</div>
+                        <div class="text-xs text-gray-600">Total Nilai: <span id="statPendingCashCodesValue">-</span></div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <a href="/admin/pending-cash-codes" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Card Voucher Aktif -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Voucher Aktif</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="statActiveVouchersCount">-</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-tags fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+             <a href="/admin/vouchers" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Card Transaksi Hari Ini -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Transaksi Hari Ini</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="statTransactionsTodayCount">-</div>
+                        <div class="text-xs text-gray-600">Total Pemasukan: <span id="statTransactionsTodayRevenue">-</span></div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <a href="/admin/transactions" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Tambahkan card lain jika perlu -->
+
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <p>Selamat datang di panel admin Photobooth! Gunakan menu di samping untuk navigasi dan mengelola aplikasi.</p>
+        <!-- Tombol Aksi Cepat -->
+        <div class="mt-4">
+            <a href="/admin/cash-codes/generate" class="btn btn-lg btn-primary mr-2 mb-2"><i class="fas fa-cash-register"></i> Generate Kode Cash</a>
+            <a href="/admin/vouchers" class="btn btn-lg btn-info mr-2 mb-2"><i class="fas fa-tags"></i> Manajemen Voucher</a>
+            <a href="/admin/transactions" class="btn btn-lg btn-secondary mb-2"><i class="fas fa-history"></i> Lihat Transaksi</a>
+        </div>
+    </div>
+</div>
+
+<%# Skrip khusus untuk halaman dashboard %>
+<%
+locals.page_custom_scripts = `
+    <script src="/js/admin-dashboard.js"></script> 
+`;
+%>

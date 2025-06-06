@@ -1,0 +1,100 @@
+<%# backend-api/src/views/admin-transactions.ejs %>
+
+<% locals.title = "Daftar Transaksi"; %>
+<% locals.pageHeading = "Riwayat Transaksi"; %>
+<% locals.currentPath = "/admin/transactions"; %>
+
+<!-- Form Filter -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Filter Transaksi</h6>
+    </div>
+    <div class="card-body">
+        <form id="filterTransactionsForm" class="form-inline">
+            <div class="form-group mb-2 mr-sm-2">
+                <label for="filterYear" class="sr-only">Tahun</label>
+                <select class="form-control" id="filterYear" name="year">
+                    <option value="">Semua Tahun</option>
+                    <% const currentYear = new Date().getFullYear(); %>
+                    <% for(let y = currentYear; y >= currentYear - 5; y--) { %>
+                        <option value="<%= y %>"><%= y %></option>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                <label for="filterMonth" class="sr-only">Bulan</label>
+                <select class="form-control" id="filterMonth" name="month">
+                    <option value="">Semua Bulan</option>
+                    <% const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]; %>
+                    <% months.forEach((monthName, index) => { %>
+                        <option value="<%= index + 1 %>"><%= monthName %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2 mr-sm-2">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <button type="button" class="btn btn-secondary mb-2 mr-sm-2" id="resetFilterButton">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+            <button type="button" class="btn btn-success mb-2" id="exportExcelButton">
+                <i class="fas fa-file-excel"></i> Export ke Excel
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Tabel Transaksi -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Semua Transaksi Tercatat</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="transactionsTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tgl. Dibuat</th>
+                        <th>Tgl. Bayar</th>
+                        <th>Metode</th>
+                        <th>Status</th>
+                        <th>Ref. Internal</th>
+                        <th>Ref. Eksternal</th>
+                        <th>Pelanggan</th>
+                        <th>Harga Asli</th>
+                        <th>Diskon</th>
+                        <th>Total Bayar</th>
+                        <th>Voucher</th>
+                        <th>Kode Cash</th>
+                        <th>Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="14" class="text-center">Memuat data transaksi... <i class="fas fa-spinner fa-spin"></i></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="10" style="text-align:right">Total Pemasukan (LUNAS):</th>
+                        <th id="totalRevenuePaid" style="text-align:right;"></th>
+                        <th colspan="3"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%# Memuat DataTables dan JavaScript khusus untuk halaman ini %>
+<%
+locals.page_plugins_scripts = `
+    <script src="/sb-admin-2/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <link href="/sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+`;
+locals.page_custom_scripts = `
+    <script src="/js/admin-transactions.js"></script> 
+`;
+%>

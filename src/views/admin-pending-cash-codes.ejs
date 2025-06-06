@@ -1,0 +1,58 @@
+<%# backend-api/src/views/admin-pending-cash-codes.ejs %>
+
+<% locals.title = "Kode Cash Belum Terpakai"; %>
+<% locals.pageHeading = "Manajemen Kode Cash Belum Terpakai"; %>
+<% locals.currentPath = "/admin/pending-cash-codes"; %>
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><%= pageHeading %></h1>
+    <button class="btn btn-success btn-icon-split" id="exportPendingCashCodesButton">
+        <span class="icon text-white-50">
+            <i class="fas fa-file-excel"></i>
+        </span>
+        <span class="text">Export ke Excel</span>
+    </button>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Daftar Kode Cash (Status: PENDING)</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="pendingCashCodesTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kode Cash</th>
+                        <th>Harga Asli (Rp)</th>
+                        <th>Diskon (Rp)</th>
+                        <th>Total Bayar (Rp)</th>
+                        <th>Voucher Digunakan</th>
+                        <th>Dibuat Oleh</th>
+                        <th>Tgl. Dibuat</th>
+                        <th>Tgl. Kadaluwarsa</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="10" class="text-center">Memuat data kode cash pending... <i class="fas fa-spinner fa-spin"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%# Memuat DataTables dan JavaScript khusus untuk halaman ini %>
+<%
+locals.page_plugins_scripts = `
+    <script src="/sb-admin-2/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <link href="/sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+`;
+locals.page_custom_scripts = `
+    <script src="/js/admin-pending-cash-codes.js"></script> 
+`;
+%>

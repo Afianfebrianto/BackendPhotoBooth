@@ -1,0 +1,89 @@
+<%# backend-api/src/views/admin-generate-cash-code.ejs %>
+
+<% locals.title = "Generate Kode Cash"; %>
+<% locals.pageHeading = "Generate Kode Pembayaran Cash"; %>
+<% locals.currentPath = "/admin/cash-codes/generate"; %>
+
+<div class="row">
+    <div class="col-lg-10 col-md-12 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Buat Kode Pembayaran Cash Baru</h6>
+            </div>
+            <div class="card-body">
+                <form id="generateCashCodeForm">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="numberOfCodes">Jumlah Kode Dibuat:</label>
+                            <input type="number" class="form-control" id="numberOfCodes" name="numberOfCodes" min="1" max="100" value="1" required>
+                            <small class="form-text text-muted">Jumlah kode yang akan digenerate (1-100).</small>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="amountPerCode">Harga per Kode (Rp):</label>
+                            <input type="number" class="form-control" id="amountPerCode" name="amountPerCode" min="1000" step="1000" value="30000" required>
+                            <small class="form-text text-muted">Harga dasar sebelum voucher.</small>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="cashVoucherCode">Kode Voucher (Opsional):</label>
+                            <input type="text" class="form-control" id="cashVoucherCode" name="voucher_code" placeholder="Masukkan kode voucher">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row align-items-end">
+                        <div class="form-group col-md-6">
+                            <label for="expiryDateInput">Tanggal Kadaluwarsa (Opsional):</label>
+                            <input type="date" class="form-control" id="expiryDateInput" name="expiry_date">
+                        </div>
+                        <div class="form-group col-md-6 d-flex align-items-center pb-2">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="unlimitedExpiryCheckbox" name="unlimited_expiry">
+                                <label class="custom-control-label" for="unlimitedExpiryCheckbox">Tidak Ada Kadaluwarsa</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block mt-3" id="generateCodeButton">
+                        <i class="fas fa-cogs"></i> Generate Kode Pembayaran
+                    </button>
+                </form>
+
+                <div id="generateProgress" class="mt-3" style="display:none;">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <p class="text-center mt-1" id="progressStatusText"></p>
+                </div>
+
+                <div id="generatedCodeResult" class="mt-4" style="display:none;">
+                    <h4 id="resultTitle">Kode Pembayaran Berhasil Dibuat:</h4>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Kode</th>
+                                    <th>Harga Awal (Rp)</th>
+                                    <th>Diskon (Rp)</th>
+                                    <th>Total Bayar (Rp)</th>
+                                    <th>Voucher</th>
+                                    <th>Kadaluwarsa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="generatedCodesTableBody">
+                                <!-- Kode yang digenerate akan ditampilkan di sini -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="generateError" class="alert alert-danger mt-3" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%# Skrip khusus untuk halaman ini %>
+<%
+locals.page_custom_scripts = `
+    <script src="/js/admin-generate-cash-code.js"></script> 
+`;
+%>

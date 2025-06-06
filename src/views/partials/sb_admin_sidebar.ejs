@@ -1,0 +1,69 @@
+<%# backend-api/src/views/partials/sb_admin_sidebar.ejs %>
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin/dashboard">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-camera-retro"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Photobooth Admin</div>
+    </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <li class="nav-item <%= (currentPath === '/admin/dashboard') ? 'active' : '' %>">
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Fitur Utama
+    </div>
+
+    <li class="nav-item <%= (currentPath === '/admin/cash-codes/generate') ? 'active' : '' %>">
+        <a class="nav-link" href="/admin/cash-codes/generate">
+            <i class="fas fa-fw fa-cash-register"></i>
+            <span>Generate Kode Cash</span></a>
+    </li>
+
+     <!-- Nav Item - Manajemen Kode Cash Belum Terpakai (BARU) -->
+    <li class="nav-item <%= (currentPath === '/admin/pending-cash-codes') ? 'active' : '' %>">
+        <a class="nav-link" href="/admin/pending-cash-codes">
+            <i class="fas fa-fw fa-hourglass-half"></i>
+            <span>Kode Cash Pending</span></a>
+    </li>
+
+    <li class="nav-item <%= (currentPath === '/admin/vouchers') ? 'active' : '' %>">
+        <a class="nav-link" href="/admin/vouchers">
+            <i class="fas fa-fw fa-tags"></i>
+            <span>Manajemen Voucher</span></a>
+    </li>
+    
+    <li class="nav-item <%= (currentPath === '/admin/transactions') ? 'active' : '' %>">
+        <a class="nav-link" href="/admin/transactions">
+            <i class="fas fa-fw fa-history"></i>
+            <span>Daftar Transaksi</span></a>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Akun
+    </div>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
+            <i class="fas fa-fw fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </li>
+
+
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+</ul>

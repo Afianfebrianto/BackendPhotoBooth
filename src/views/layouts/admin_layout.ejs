@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Admin Dashboard Photobooth">
+    <meta name="author" content="Nama Kamu">
+
+    <title><%= typeof title !== 'undefined' ? title : 'Admin Photobooth' %></title>
+
+    <link href="/sb-admin-2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <link href="/sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <link href="/css/admin-custom.css" rel="stylesheet"> 
+</head>
+
+<body id="page-top">
+
+    <div id="wrapper">
+
+        <%- include('../partials/sb_admin_sidebar', { user: typeof user !== 'undefined' ? user : null, currentPath: typeof currentPath !== 'undefined' ? currentPath : '' }) %>
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <div id="content">
+
+                <%- include('../partials/sb_admin_topbar', { user: typeof user !== 'undefined' ? user : null }) %>
+                <div class="container-fluid">
+                    <% if (typeof pageHeading !== 'undefined' && pageHeading) { %>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800"><%= pageHeading %></h1>
+                        <% if (typeof pageSubHeading !== 'undefined' && pageSubHeading) { %>
+                            <a href="<%= pageSubHeading.link %>" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas <%= pageSubHeading.icon %> fa-sm text-white-50"></i> <%= pageSubHeading.text %>
+                            </a>
+                        <% } %>
+                    </div>
+                    <% } %>
+
+                    <%- body %>
+
+                </div>
+                </div>
+            <%- include('../partials/sb_admin_footer') %>
+            </div>
+        </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <%- include('../partials/sb_admin_logout_modal') %>
+
+    <script src="/sb-admin-2/vendor/jquery/jquery.min.js"></script>
+    <script src="/sb-admin-2/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/sb-admin-2/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <script src="/sb-admin-2/js/sb-admin-2.min.js"></script>
+
+  <% if (typeof page_plugins_scripts !== 'undefined' && page_plugins_scripts) { %>
+    <%- page_plugins_scripts %>  <% } %>
+
+<% if (typeof page_custom_scripts !== 'undefined' && page_custom_scripts) { %>
+    <%- page_custom_scripts %>   <% } %>
+
+    <% if (typeof page_custom_scripts !== 'undefined') { %>
+    <%- page_custom_scripts %>
+<% } %>
+    
+    <script src="/js/admin-auth.js"></script> 
+</body>
+</html>

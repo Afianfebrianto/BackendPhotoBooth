@@ -1,0 +1,130 @@
+<%# backend-api/src/views/admin-vouchers.ejs %>
+
+<% locals.title = "Manajemen Voucher"; %>
+<% locals.pageHeading = "Manajemen Voucher"; %>
+<% locals.currentPath = "/admin/vouchers"; %>
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><%= pageHeading %></h1>
+    <button class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#addVoucherModal">
+        <span class="icon text-white-50">
+            <i class="fas fa-plus"></i>
+        </span>
+        <span class="text">Tambah Voucher Baru</span>
+    </button>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Daftar Voucher</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="vouchersTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Deskripsi</th>
+                        <th>Tipe</th>
+                        <th>Nilai</th>
+                        <th>Min. Beli</th>
+                        <th>Maks. Diskon</th>
+                        <th>Kadaluwarsa</th>
+                        <th>Aktif</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="9" class="text-center">Memuat data voucher...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addVoucherModal" tabindex="-1" role="dialog" aria-labelledby="voucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="voucherModalLabel">Tambah Voucher Baru</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form id="voucherForm">
+                <div class="modal-body">
+                    <input type="hidden" id="voucherId" name="voucherId"> <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="voucherCode">Kode Voucher</label>
+                            <input type="text" class="form-control" id="voucherCode" name="code" required maxlength="50">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="voucherType">Tipe</label>
+                            <select class="form-control" id="voucherType" name="type" required>
+                                <option value="fixed">Fixed (Nominal)</option>
+                                <option value="percentage">Percentage (Persentase)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="voucherDescription">Deskripsi</label>
+                        <textarea class="form-control" id="voucherDescription" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="voucherValue">Nilai</label>
+                            <input type="number" class="form-control" id="voucherValue" name="value" required step="0.01" min="0">
+                            <small class="form-text text-muted">Untuk persentase, masukkan desimal (misal 0.1 untuk 10%).</small>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="voucherMinPurchase">Pembelian Minimum (Rp) (Opsional)</label>
+                            <input type="number" class="form-control" id="voucherMinPurchase" name="min_purchase" step="1" min="0" value="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="voucherMaxDiscount">Maksimum Diskon (Rp) (Opsional, untuk tipe persentase)</label>
+                            <input type="number" class="form-control" id="voucherMaxDiscount" name="max_discount" step="1" min="0">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="voucherExpiryDate">Tanggal Kadaluwarsa (Opsional)</label>
+                            <input type="date" class="form-control" id="voucherExpiryDate" name="expiry_date">
+                        </div>
+                    </div>
+                     <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="voucherUsageLimit">Batas Penggunaan (Opsional, 0 jika tak terbatas)</label>
+                            <input type="number" class="form-control" id="voucherUsageLimit" name="usage_limit" step="1" min="0">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="voucherIsActive">Status Aktif</label>
+                            <select class="form-control" id="voucherIsActive" name="is_active">
+                                <option value="true" selected>Aktif</option>
+                                <option value="false">Tidak Aktif</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary" type="submit" id="saveVoucherButton">Simpan Voucher</button>
+                </div>
+            </form>
+            <div id="voucherFormError" class="text-danger mt-2" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<%# Kita akan tambahkan DataTables dan JavaScript untuk halaman ini %>
+<%
+locals.page_plugins_scripts = `
+    <script src="/sb-admin-2/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <link href="/sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+`;
+locals.page_custom_scripts = `
+    <script src="/js/admin-vouchers.js"></script> 
+`;
+%>
