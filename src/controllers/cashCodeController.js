@@ -31,7 +31,7 @@ function generateSingleUniqueCode(length = 8) {
     for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-    return `CASH-${result}`;
+    return `${result}`;
     // TODO: Pastikan kode ini benar-benar unik di database, mungkin perlu loop cek
 }
 
@@ -206,6 +206,15 @@ exports.redeemCashCode = async (req, res) => {
 
         const cashCodeData = codeRows[0];
 
+        // --- LOGIKA BARU: UPDATE PENGGUNAAN VOUCHER ---
+        if (cashCodeData.voucher_id) {
+            console.log(`CASH_CODE_CONTROLLER: Menambah hitungan penggunaan untuk voucher ID: ${cashCodeData.voucher_id}`);
+            await client.query(
+                'UPDATE vouchers SET times_used = times_used + 1, updated_at = NOW() WHERE id = $1',
+                [cashCodeData.voucher_id]
+            );
+        }
+        // --- AKHIR LOGIKA BARU ---
         if (cashCodeData.status === 'REDEEMED') { 
             await client.query('ROLLBACK');
             return res.status(400).json({ success: false, message: `Kode pembayaran "${cash_code}" sudah digunakan.` });

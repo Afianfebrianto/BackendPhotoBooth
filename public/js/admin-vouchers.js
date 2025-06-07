@@ -284,7 +284,74 @@ $(document).ready(function() {
                 alert('Error: ' + error.message);
             }
         }
+    }); // --- LOGIKA BARU UNTUK GENERATE MASSAL ---
+    const generateBatchForm = document.getElementById('generateBatchForm');
+    const generateBatchButton = document.getElementById('generateBatchButton');
+    const batchFormError = document.getElementById('batchFormError');
+    const batchResultDiv = document.getElementById('batchResult');
+    const batchResultTextarea = document.getElementById('batchResultTextarea');
+
+    if (generateBatchForm) {
+        generateBatchForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            generateBatchButton.disabled = true;
+            generateBatchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            batchFormError.style.display = 'none';
+            batchResultDiv.style.display = 'none';
+
+            const formData = {
+                count: parseInt(document.getElementById('batchCount').value, 10),
+                prefix: document.getElementById('batchPrefix').value.trim(),
+                description: document.getElementById('batchDescription').value.trim(),
+                value: parseFloat(document.getElementById('batchValue').value),
+                expiry_date: document.getElementById('batchExpiryDate').value || null
+            };
+
+            if (formData.expiry_date === "") formData.expiry_date = null;
+
+            try {
+                if (typeof fetchWithAuth !== 'function') throw new Error("Fungsi otentikasi tidak ditemukan.");
+                
+                const response = await fetchWithAuth('/api/vouchers/generate-batch', {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+
+                if (result.success && Array.isArray(result.data)) {
+                    batchResultTextarea.value = result.data.join('\n'); // Tampilkan kode baru dipisahkan baris baru
+                    batchResultDiv.style.display = 'block';
+                    alert(result.message);
+                    // Muat ulang tabel utama untuk menampilkan voucher baru
+                    loadVouchers(); 
+                    // Tutup modal setelah sukses (opsional)
+                    // $('#generateBatchModal').modal('hide');
+                } else {
+                    batchFormError.textContent = result.message || "Gagal membuat voucher.";
+                    batchFormError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Error saat generate voucher massal:", error);
+                batchFormError.textContent = 'Terjadi kesalahan: ' + error.message;
+                batchFormError.style.display = 'block';
+            } finally {
+                generateBatchButton.disabled = false;
+                generateBatchButton.textContent = 'Generate Sekarang';
+            }
+        });
+    }
+    
+    // Saat modal generate massal dibuka, reset state
+    $('#generateBatchModal').on('show.bs.modal', function () {
+        $('#generateBatchForm')[0].reset();
+        $('#batchFormError').hide().text('');
+        $('#batchResult').hide();
+        $('#batchResultTextarea').val('');
+        generateBatchButton.disabled = false;
+        generateBatchButton.textContent = 'Generate Sekarang';
     });
+
+
     
     // Muat data voucher saat halaman siap
     console.log("ADMIN-VOUCHERS.JS: Memanggil loadVouchers() untuk pertama kali.");

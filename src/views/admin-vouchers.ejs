@@ -6,6 +6,12 @@
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800"><%= pageHeading %></h1>
+     <button class="btn btn-success btn-icon-split mr-2" data-toggle="modal" data-target="#generateBatchModal">
+            <span class="icon text-white-50">
+                <i class="fas fa-layer-group"></i>
+            </span>
+            <span class="text">Generate Massal (Sekali Pakai)</span>
+        </button>
     <button class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#addVoucherModal">
         <span class="icon text-white-50">
             <i class="fas fa-plus"></i>
@@ -113,6 +119,61 @@
                 </div>
             </form>
             <div id="voucherFormError" class="text-danger mt-2" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+<!-- MODAL BARU: Generate Voucher Massal -->
+<div class="modal fade" id="generateBatchModal" tabindex="-1" role="dialog" aria-labelledby="generateBatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generateBatchModalLabel">Generate Voucher Massal (Sekali Pakai)</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form id="generateBatchForm">
+                <div class="modal-body">
+                    <p>Fitur ini akan membuat sejumlah voucher unik dengan pengaturan yang sama. Setiap voucher hanya bisa digunakan satu kali (`usage_limit = 1`).</p>
+                    <hr>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="batchCount">Jumlah Kode Dibuat:</label>
+                            <input type="number" class="form-control" id="batchCount" name="count" min="1" max="200" value="10" required>
+                            <small class="form-text text-muted">Jumlah voucher yang akan dibuat (maks. 200 per request).</small>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="batchPrefix">Prefix Kode (Opsional):</label>
+                            <input type="text" class="form-control" id="batchPrefix" name="prefix" placeholder="Contoh: EVENTSPESIAL">
+                            <small class="form-text text-muted">Teks awalan untuk setiap kode voucher.</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchDescription">Deskripsi Voucher:</label>
+                        <textarea class="form-control" id="batchDescription" name="description" rows="2" required placeholder="Contoh: Voucher Diskon Event Juni"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="batchValue">Nilai Potongan Harga (Rp):</label>
+                            <input type="number" class="form-control" id="batchValue" name="value" required step="1000" min="1000" value="10000">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="batchExpiryDate">Tanggal Kadaluwarsa (Opsional):</label>
+                            <input type="date" class="form-control" id="batchExpiryDate" name="expiry_date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary" type="submit" id="generateBatchButton">Generate Sekarang</button>
+                </div>
+            </form>
+            <div id="batchFormError" class="alert alert-danger mx-3" style="display:none;"></div>
+            <div id="batchResult" class="m-3" style="display:none;">
+                <h6>Hasil Generate Voucher:</h6>
+                <textarea class="form-control" rows="8" readonly id="batchResultTextarea"></textarea>
+                <small>Simpan daftar kode ini. Kode-kode ini juga sudah masuk ke dalam daftar utama.</small>
+            </div>
         </div>
     </div>
 </div>

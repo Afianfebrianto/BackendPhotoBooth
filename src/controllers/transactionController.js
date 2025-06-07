@@ -276,6 +276,16 @@ exports.recordQrisTransaction = async (tripayData, electronRef = null) => {
                 // Pertimbangkan apakah ini error atau boleh lanjut tanpa voucher_id
             }
         }
+
+        // --- LOGIKA BARU: UPDATE PENGGUNAAN VOUCHER ---
+        if (voucherId) {
+            console.log(`TRANSACTION_CONTROLLER: Menambah hitungan penggunaan untuk voucher ID: ${voucherId}`);
+            await client.query(
+                'UPDATE vouchers SET times_used = times_used + 1, updated_at = NOW() WHERE id = $1',
+                [voucherId]
+            );
+        }
+        // --- AKHIR LOGIKA BARU ---
             
             const actualBaseAmount = parseFloat(base_amount);
         const actualDiscountApplied = parseFloat(discount_applied) || 0;

@@ -1,6 +1,90 @@
 // backend-api/src/controllers/voucherController.js
 const db = require('../db');
 
+
+// Fungsi helper untuk generate kode acak
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Hindari karakter yg mirip (I,1,O,0)
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+// Fungsi BARU untuk Generate Voucher Massal
+exports.generateBatchVouchers = async (req, res) => {
+    const { 
+        count = 10, 
+        prefix = '', 
+        description, 
+        value, 
+        expiry_date = null 
+    } = req.body;
+
+    console.log("VOUCHER_CONTROLLER: generateBatchVouchers dipanggil dengan data:", req.body);
+
+    // Validasi Input
+    if (!description || typeof value === 'undefined') {
+        return res.status(400).json({ success: false, message: 'Deskripsi dan Nilai voucher harus diisi.' });
+    }
+    const numCount = parseInt(count, 10);
+    if (isNaN(numCount) || numCount < 1 || numCount > 200) {
+        return res.status(400).json({ success: false, message: 'Jumlah (count) harus antara 1 dan 200.' });
+    }
+
+    const client = await db.pool.connect();
+    const generatedVouchers = [];
+
+    try {
+        await client.query('BEGIN');
+
+        for (let i = 0; i < numCount; i++) {
+            // Buat kode unik: PREFIX + 8 karakter acak
+            // Tambahkan loop untuk memastikan keunikan jika ada kemungkinan duplikasi
+            let uniqueCode;
+            let isUnique = false;
+            let attempt = 0;
+            while (!isUnique && attempt < 10) { // Coba max 10 kali jika ada duplikasi
+                uniqueCode = (prefix ? prefix.toUpperCase().trim() : '') + generateRandomString(8);
+                const { rows } = await client.query('SELECT id FROM vouchers WHERE code = $1', [uniqueCode]);
+                if (rows.length === 0) {
+                    isUnique = true;
+                }
+                attempt++;
+            }
+
+            if (!isUnique) {
+                throw new Error("Gagal membuat kode unik setelah beberapa percobaan. Coba lagi atau ganti prefix.");
+            }
+
+            // Insert voucher baru ke database
+            const { rows: insertedRows } = await client.query(
+                `INSERT INTO vouchers (code, description, type, value, expiry_date, usage_limit, times_used, is_active)
+                 VALUES ($1, $2, 'fixed', $3, $4, 1, 0, TRUE)
+                 RETURNING *`,
+                [uniqueCode, description, value, expiry_date || null]
+            );
+            generatedVouchers.push(insertedRows[0]);
+        }
+        
+        await client.query('COMMIT');
+        console.log(`VOUCHER_CONTROLLER: ${generatedVouchers.length} voucher massal berhasil dibuat.`);
+        res.status(201).json({ 
+            success: true, 
+            message: `${generatedVouchers.length} voucher sekali pakai berhasil dibuat.`,
+            data: generatedVouchers.map(v => v.code) // Kirim kembali daftar kode yang dibuat
+        });
+
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('VOUCHER_CONTROLLER: Error membuat voucher massal:', error);
+        res.status(500).json({ success: false, message: 'Gagal membuat voucher massal: ' + error.message });
+    } finally {
+        client.release();
+    }
+};
+
 // Fungsi ini sudah ada, untuk Electron app memvalidasi voucher
 exports.validateVoucher = async (req, res) => {
     const { voucher_code, base_amount } = req.body;
@@ -14,15 +98,24 @@ exports.validateVoucher = async (req, res) => {
     }
 
     try {
-        const { rows } = await db.query(
-            'SELECT code, type, value, description, min_purchase, max_discount, expiry_date, is_active FROM vouchers WHERE UPPER(code) = UPPER($1) AND is_active = TRUE',
-            [voucher_code]
-        );
+        // PERBAIKAN QUERY: Tambahkan pengecekan usage_limit dan times_used
+        const queryText = `
+            SELECT id, code, type, value, description, min_purchase, max_discount, 
+                   expiry_date, is_active, usage_limit, times_used 
+            FROM vouchers 
+            WHERE UPPER(code) = UPPER($1) AND is_active = TRUE
+        `;
+        const { rows } = await db.query(queryText, [voucher_code]);
 
         if (rows.length === 0) {
             return res.status(404).json({ success: false, message: `Kode voucher "${voucher_code}" tidak ditemukan atau tidak aktif.` });
         }
         const voucher = rows[0];
+
+        // PENGECEKAN BARU: Validasi batas penggunaan
+        if (voucher.usage_limit !== null && voucher.times_used >= voucher.usage_limit) {
+            return res.status(400).json({ success: false, message: `Kode voucher "${voucher_code}" sudah mencapai batas penggunaan.` });
+        }
 
         if (voucher.expiry_date) {
             const today = new Date();

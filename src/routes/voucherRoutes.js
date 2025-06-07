@@ -15,6 +15,9 @@ router.get('/', authenticateTokenApi, authorizeRole(['admin', 'kasir']), voucher
 // POST buat voucher baru (hanya admin)
 router.post('/', authenticateTokenApi, authorizeRole(['admin']), voucherController.createVoucher);
 
+// ENDPOINT BARU: POST untuk generate voucher massal (hanya admin)
+router.post('/generate-batch', authenticateTokenApi, authorizeRole(['admin']), voucherController.generateBatchVouchers);
+
 // PUT update voucher (hanya admin)
 router.put('/:id', authenticateTokenApi, authorizeRole(['admin']), voucherController.updateVoucher);
 
