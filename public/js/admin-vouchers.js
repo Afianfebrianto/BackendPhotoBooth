@@ -63,6 +63,11 @@ $(document).ready(function() {
             // tbody.html('<tr><td colspan="9" class="text-center">Belum ada voucher. Silakan tambahkan voucher baru.</td></tr>');
         } else {
             vouchers.forEach(voucher => {
+                  let usageText = `${voucher.times_used} / ${voucher.usage_limit || '∞'}`;
+            if (voucher.usage_limit !== null && voucher.times_used >= voucher.usage_limit) {
+                // Tandai jika sudah habis
+                usageText = `<span class="font-weight-bold text-danger">${usageText}</span>`;
+            }
                 const expiryDate = voucher.expiry_date ? new Date(voucher.expiry_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
                 const isActive = voucher.is_active ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Tidak Aktif</span>';
                 const maxDiscount = voucher.max_discount ? 'Rp ' + parseFloat(voucher.max_discount).toLocaleString('id-ID') : '-';
@@ -75,6 +80,7 @@ $(document).ready(function() {
                         <td>${voucher.description || '-'}</td>
                         <td>${voucher.type}</td>
                         <td>${valueDisplay}</td>
+                        <td>${usageText}</td> 
                         <td>${minPurchase}</td>
                         <td>${maxDiscount}</td>
                         <td>${expiryDate}</td>
@@ -84,6 +90,9 @@ $(document).ready(function() {
                             <button class="btn btn-sm btn-warning btn-toggle-active" data-id="${voucher.id}" data-active="${voucher.is_active}" title="${voucher.is_active ? 'Nonaktifkan' : 'Aktifkan'}">
                                 <i class="fas ${voucher.is_active ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
                             </button>
+                             <button class="btn btn-sm btn-danger btn-delete" data-id="${voucher.id}" data-code="${voucher.code}" title="Hapus Permanen">
+                            <i class="fas fa-trash"></i>
+                        </button>
                         </td>
                     </tr>
                 `);
@@ -351,6 +360,57 @@ $(document).ready(function() {
         generateBatchButton.textContent = 'Generate Sekarang';
     });
 
+
+     // Handle klik tombol "Hapus Voucher Habis Pakai"
+    $('#deleteUsedUpButton').on('click', async function() {
+        console.log("ADMIN-VOUCHERS.JS: Tombol Hapus Voucher Habis Pakai diklik.");
+        if (confirm('Anda yakin ingin menghapus SEMUA voucher yang sudah mencapai batas penggunaannya secara permanen? Aksi ini tidak bisa dibatalkan.')) {
+            try {
+                if (typeof fetchWithAuth !== 'function') throw new Error("Fungsi otentikasi tidak ditemukan.");
+                
+                const response = await fetchWithAuth('/api/vouchers/used-up', {
+                    method: 'DELETE',
+                });
+                const result = await response.json();
+                
+                alert(result.message || 'Proses selesai.');
+                loadVouchers(); // Muat ulang tabel untuk melihat hasilnya
+
+            } catch (error) {
+                console.error("Error saat menghapus voucher habis pakai:", error);
+                alert('Gagal melakukan operasi: ' + error.message);
+            }
+        }
+    });
+
+    // Handle klik tombol hapus per baris
+    $('#vouchersTable tbody').on('click', '.btn-delete', async function() {
+        const voucherId = $(this).data('id');
+        const voucherCode = $(this).data('code');
+        console.log(`ADMIN-VOUCHERS.JS: Tombol Hapus Permanen diklik untuk ID: ${voucherId}`);
+        
+        if (confirm(`Anda yakin ingin menghapus voucher "${voucherCode}" (ID: ${voucherId}) secara PERMANEN? Aksi ini tidak dapat dibatalkan.`)) {
+            try {
+                if (typeof fetchWithAuth !== 'function') throw new Error("Fungsi otentikasi tidak ditemukan.");
+                
+                const response = await fetchWithAuth(`/api/vouchers/${voucherId}`, {
+                    method: 'DELETE',
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message || 'Voucher berhasil dihapus.');
+                    loadVouchers(); // Muat ulang tabel
+                } else {
+                    alert('Gagal menghapus: ' + (result.message || 'Error tidak diketahui.'));
+                }
+
+            } catch (error) {
+                console.error(`Error menghapus voucher ID ${voucherId}:`, error);
+                alert('Gagal melakukan operasi: ' + error.message);
+            }
+        }
+    });
 
     
     // Muat data voucher saat halaman siap

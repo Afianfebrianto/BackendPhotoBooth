@@ -275,29 +275,50 @@ exports.updateVoucher = async (req, res) => {
     }
 };
 
-// Menghapus Voucher (atau lebih baik menonaktifkan)
+// Menghapus Voucher (sekarang menjadi hapus permanen)
 exports.deleteVoucher = async (req, res) => {
     const { id } = req.params;
+    console.log(`VOUCHER_CONTROLLER: deleteVoucher dipanggil untuk ID: ${id}`);
     try {
-        // Opsi 1: Hapus permanen
-        // const result = await db.query('DELETE FROM vouchers WHERE id = $1 RETURNING *', [id]);
-        // if (result.rowCount === 0) {
-        //     return res.status(404).json({ success: false, message: 'Voucher tidak ditemukan.' });
-        // }
-        // res.json({ success: true, message: 'Voucher berhasil dihapus.'});
-
-        // Opsi 2: Nonaktifkan (lebih aman untuk history)
-        const { rows } = await db.query(
-            'UPDATE vouchers SET is_active = FALSE, updated_at = NOW() WHERE id = $1 RETURNING *',
-            [id]
-        );
-        if (rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Voucher tidak ditemukan.' });
+        // Hapus permanen dari database
+        const result = await db.query('DELETE FROM vouchers WHERE id = $1 RETURNING *', [id]);
+        
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, message: 'Voucher tidak ditemukan untuk dihapus.' });
         }
-        res.json({ success: true, message: 'Voucher berhasil dinonaktifkan.', data: rows[0] });
+        res.json({ success: true, message: 'Voucher berhasil dihapus secara permanen.'});
 
     } catch (error) {
-        console.error(`Error menghapus/menonaktifkan voucher ID ${id}:`, error);
-        res.status(500).json({ success: false, message: 'Gagal menghapus/menonaktifkan voucher.' });
+        console.error(`Error menghapus voucher ID ${id}:`, error);
+        // Tangani jika ada foreign key constraint violation
+        if (error.code === '23503') {
+             return res.status(409).json({ success: false, message: 'Gagal menghapus: Voucher ini masih terkait dengan data transaksi.' });
+        }
+        res.status(500).json({ success: false, message: 'Gagal menghapus voucher karena kesalahan server.' });
+    }
+};
+
+// Fungsi BARU untuk menghapus semua voucher yang sudah habis terpakai
+exports.deleteUsedUpVouchers = async (req, res) => {
+    console.log("VOUCHER_CONTROLLER: deleteUsedUpVouchers dipanggil.");
+    try {
+        // Hapus voucher di mana usage_limit tidak NULL (memiliki batas) dan times_used sudah mencapai atau melebihi limit tersebut.
+        const result = await db.query(
+            `DELETE FROM vouchers 
+             WHERE usage_limit IS NOT NULL AND times_used >= usage_limit 
+             RETURNING id`
+        );
+        
+        const deletedCount = result.rowCount;
+
+        if (deletedCount === 0) {
+            return res.json({ success: true, message: 'Tidak ada voucher habis pakai yang ditemukan untuk dihapus.' });
+        }
+
+        res.json({ success: true, message: `${deletedCount} voucher yang sudah habis pakai berhasil dihapus.` });
+
+    } catch (error) {
+        console.error('Error menghapus voucher habis pakai:', error);
+        res.status(500).json({ success: false, message: 'Gagal membersihkan voucher habis pakai.' });
     }
 };

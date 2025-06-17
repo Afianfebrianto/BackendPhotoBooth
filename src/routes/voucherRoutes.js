@@ -21,6 +21,9 @@ router.post('/generate-batch', authenticateTokenApi, authorizeRole(['admin']), v
 // PUT update voucher (hanya admin)
 router.put('/:id', authenticateTokenApi, authorizeRole(['admin']), voucherController.updateVoucher);
 
+// ENDPOINT BARU: DELETE untuk hapus massal voucher yang sudah habis
+router.delete('/used-up', authenticateTokenApi, authorizeRole(['admin']), voucherController.deleteUsedUpVouchers);
+
 // DELETE voucher (menonaktifkan) (hanya admin)
 router.delete('/:id', authenticateTokenApi, authorizeRole(['admin']), voucherController.deleteVoucher);
 

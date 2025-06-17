@@ -6,6 +6,13 @@
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800"><%= pageHeading %></h1>
+    <!-- TOMBOL BARU UNTUK HAPUS MASSAL -->
+        <button class="btn btn-danger btn-icon-split mr-2" id="deleteUsedUpButton">
+            <span class="icon text-white-50">
+                <i class="fas fa-broom"></i>
+            </span>
+            <span class="text">Hapus Voucher Habis Pakai</span>
+        </button>
      <button class="btn btn-success btn-icon-split mr-2" data-toggle="modal" data-target="#generateBatchModal">
             <span class="icon text-white-50">
                 <i class="fas fa-layer-group"></i>
@@ -33,6 +40,7 @@
                         <th>Deskripsi</th>
                         <th>Tipe</th>
                         <th>Nilai</th>
+                         <th>Digunakan</th> <!-- Kolom baru: Digunakan / Batas -->
                         <th>Min. Beli</th>
                         <th>Maks. Diskon</th>
                         <th>Kadaluwarsa</th>
